@@ -2,7 +2,7 @@
     "name": "CATPlayerInputActions",
     "maps": [
         {
-            "name": "CAT Player",
+            "name": "CAT_Character",
             "id": "04698f67-b437-4607-b1f3-39e98ad04704",
             "actions": [
                 {
@@ -29,7 +29,7 @@
                     "id": "1e372e24-867d-4451-8132-4a3a4661ebfb",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Hold",
+                    "interactions": "Press(behavior=2)",
                     "initialStateCheck": false
                 },
                 {
@@ -38,7 +38,7 @@
                     "id": "e9e1d1b9-e4f5-4220-8d99-de53e0129895",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Press(behavior=2)",
                     "initialStateCheck": false
                 },
                 {

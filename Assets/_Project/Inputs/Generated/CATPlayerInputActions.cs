@@ -24,7 +24,7 @@ public partial class @CATPlayerInputActions : IInputActionCollection2, IDisposab
     ""name"": ""CATPlayerInputActions"",
     ""maps"": [
         {
-            ""name"": ""CAT Player"",
+            ""name"": ""CAT_Character"",
             ""id"": ""04698f67-b437-4607-b1f3-39e98ad04704"",
             ""actions"": [
                 {
@@ -51,7 +51,7 @@ public partial class @CATPlayerInputActions : IInputActionCollection2, IDisposab
                     ""id"": ""1e372e24-867d-4451-8132-4a3a4661ebfb"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Hold"",
+                    ""interactions"": ""Press(behavior=2)"",
                     ""initialStateCheck"": false
                 },
                 {
@@ -60,7 +60,7 @@ public partial class @CATPlayerInputActions : IInputActionCollection2, IDisposab
                     ""id"": ""e9e1d1b9-e4f5-4220-8d99-de53e0129895"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": """",
+                    ""interactions"": ""Press(behavior=2)"",
                     ""initialStateCheck"": false
                 },
                 {
@@ -645,13 +645,13 @@ public partial class @CATPlayerInputActions : IInputActionCollection2, IDisposab
         }
     ]
 }");
-        // CAT Player
-        m_CATPlayer = asset.FindActionMap("CAT Player", throwIfNotFound: true);
-        m_CATPlayer_Move = m_CATPlayer.FindAction("Move", throwIfNotFound: true);
-        m_CATPlayer_Look = m_CATPlayer.FindAction("Look", throwIfNotFound: true);
-        m_CATPlayer_Sprint = m_CATPlayer.FindAction("Sprint", throwIfNotFound: true);
-        m_CATPlayer_Jump = m_CATPlayer.FindAction("Jump", throwIfNotFound: true);
-        m_CATPlayer_Attack = m_CATPlayer.FindAction("Attack", throwIfNotFound: true);
+        // CAT_Character
+        m_CAT_Character = asset.FindActionMap("CAT_Character", throwIfNotFound: true);
+        m_CAT_Character_Move = m_CAT_Character.FindAction("Move", throwIfNotFound: true);
+        m_CAT_Character_Look = m_CAT_Character.FindAction("Look", throwIfNotFound: true);
+        m_CAT_Character_Sprint = m_CAT_Character.FindAction("Sprint", throwIfNotFound: true);
+        m_CAT_Character_Jump = m_CAT_Character.FindAction("Jump", throwIfNotFound: true);
+        m_CAT_Character_Attack = m_CAT_Character.FindAction("Attack", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -720,49 +720,49 @@ public partial class @CATPlayerInputActions : IInputActionCollection2, IDisposab
         return asset.FindBinding(bindingMask, out action);
     }
 
-    // CAT Player
-    private readonly InputActionMap m_CATPlayer;
-    private ICATPlayerActions m_CATPlayerActionsCallbackInterface;
-    private readonly InputAction m_CATPlayer_Move;
-    private readonly InputAction m_CATPlayer_Look;
-    private readonly InputAction m_CATPlayer_Sprint;
-    private readonly InputAction m_CATPlayer_Jump;
-    private readonly InputAction m_CATPlayer_Attack;
-    public struct CATPlayerActions
+    // CAT_Character
+    private readonly InputActionMap m_CAT_Character;
+    private ICAT_CharacterActions m_CAT_CharacterActionsCallbackInterface;
+    private readonly InputAction m_CAT_Character_Move;
+    private readonly InputAction m_CAT_Character_Look;
+    private readonly InputAction m_CAT_Character_Sprint;
+    private readonly InputAction m_CAT_Character_Jump;
+    private readonly InputAction m_CAT_Character_Attack;
+    public struct CAT_CharacterActions
     {
         private @CATPlayerInputActions m_Wrapper;
-        public CATPlayerActions(@CATPlayerInputActions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Move => m_Wrapper.m_CATPlayer_Move;
-        public InputAction @Look => m_Wrapper.m_CATPlayer_Look;
-        public InputAction @Sprint => m_Wrapper.m_CATPlayer_Sprint;
-        public InputAction @Jump => m_Wrapper.m_CATPlayer_Jump;
-        public InputAction @Attack => m_Wrapper.m_CATPlayer_Attack;
-        public InputActionMap Get() { return m_Wrapper.m_CATPlayer; }
+        public CAT_CharacterActions(@CATPlayerInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Move => m_Wrapper.m_CAT_Character_Move;
+        public InputAction @Look => m_Wrapper.m_CAT_Character_Look;
+        public InputAction @Sprint => m_Wrapper.m_CAT_Character_Sprint;
+        public InputAction @Jump => m_Wrapper.m_CAT_Character_Jump;
+        public InputAction @Attack => m_Wrapper.m_CAT_Character_Attack;
+        public InputActionMap Get() { return m_Wrapper.m_CAT_Character; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(CATPlayerActions set) { return set.Get(); }
-        public void SetCallbacks(ICATPlayerActions instance)
+        public static implicit operator InputActionMap(CAT_CharacterActions set) { return set.Get(); }
+        public void SetCallbacks(ICAT_CharacterActions instance)
         {
-            if (m_Wrapper.m_CATPlayerActionsCallbackInterface != null)
+            if (m_Wrapper.m_CAT_CharacterActionsCallbackInterface != null)
             {
-                @Move.started -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnMove;
-                @Move.performed -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnMove;
-                @Move.canceled -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnMove;
-                @Look.started -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnLook;
-                @Look.performed -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnLook;
-                @Look.canceled -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnLook;
-                @Sprint.started -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnSprint;
-                @Sprint.performed -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnSprint;
-                @Sprint.canceled -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnSprint;
-                @Jump.started -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnJump;
-                @Jump.performed -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnJump;
-                @Jump.canceled -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnJump;
-                @Attack.started -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnAttack;
-                @Attack.performed -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnAttack;
-                @Attack.canceled -= m_Wrapper.m_CATPlayerActionsCallbackInterface.OnAttack;
+                @Move.started -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnMove;
+                @Move.performed -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnMove;
+                @Move.canceled -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnMove;
+                @Look.started -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnLook;
+                @Look.performed -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnLook;
+                @Look.canceled -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnLook;
+                @Sprint.started -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnSprint;
+                @Sprint.performed -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnSprint;
+                @Sprint.canceled -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnSprint;
+                @Jump.started -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnJump;
+                @Jump.performed -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnJump;
+                @Jump.canceled -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnJump;
+                @Attack.started -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnAttack;
+                @Attack.performed -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnAttack;
+                @Attack.canceled -= m_Wrapper.m_CAT_CharacterActionsCallbackInterface.OnAttack;
             }
-            m_Wrapper.m_CATPlayerActionsCallbackInterface = instance;
+            m_Wrapper.m_CAT_CharacterActionsCallbackInterface = instance;
             if (instance != null)
             {
                 @Move.started += instance.OnMove;
@@ -783,7 +783,7 @@ public partial class @CATPlayerInputActions : IInputActionCollection2, IDisposab
             }
         }
     }
-    public CATPlayerActions @CATPlayer => new CATPlayerActions(this);
+    public CAT_CharacterActions @CAT_Character => new CAT_CharacterActions(this);
 
     // UI
     private readonly InputActionMap m_UI;
@@ -907,7 +907,7 @@ public partial class @CATPlayerInputActions : IInputActionCollection2, IDisposab
             return asset.controlSchemes[m_GamepadSchemeIndex];
         }
     }
-    public interface ICATPlayerActions
+    public interface ICAT_CharacterActions
     {
         void OnMove(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
