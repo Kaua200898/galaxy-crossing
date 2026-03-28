@@ -515,6 +515,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: CAT Player Character
       objectReference: {fileID: 0}
+    - target: {fileID: 1517211957839106396, guid: d5136c88103a5b5469bc4c53c80a6f8b,
+        type: 3}
+      propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1633794994382411321, guid: d5136c88103a5b5469bc4c53c80a6f8b,
         type: 3}
       propertyPath: m_RootOrder
@@ -528,7 +533,7 @@ PrefabInstance:
     - target: {fileID: 1633794994382411321, guid: d5136c88103a5b5469bc4c53c80a6f8b,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 6.17
       objectReference: {fileID: 0}
     - target: {fileID: 1633794994382411321, guid: d5136c88103a5b5469bc4c53c80a6f8b,
         type: 3}
