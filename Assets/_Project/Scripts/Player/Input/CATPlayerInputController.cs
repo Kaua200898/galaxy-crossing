@@ -99,9 +99,4 @@ public class CATPlayerInputController : MonoBehaviour, ICATCharacterInputControl
 
         _playerInputActions.Disable();
     }
-
-    private void FixedUpdate()
-    {
-        Debug.Log(MoveVector);
-    }
 }

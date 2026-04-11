@@ -1,5 +1,5 @@
-using CAT.Character.Enums;
 using System;
+using CAT.Character.Enums;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -17,7 +17,7 @@ public class CATCharacterMovementController : MonoBehaviour
 
     [Min(0.1f)]
     [SerializeField]
-    private float _walkNominalVelocity = 7.5f;
+    private float _walkNominalVelocity = 7.0f;
 
     [Header("Sprint Movement")]
 
@@ -26,7 +26,7 @@ public class CATCharacterMovementController : MonoBehaviour
 
     [Min(0.1f)]
     [SerializeField]
-    private float _sprintNominalVelocity = 12.0f;
+    private float _sprintNominalVelocity = 14.0f;
 
     [Header("Jump")]
 
@@ -65,6 +65,9 @@ public class CATCharacterMovementController : MonoBehaviour
 
     [Header("Rotation")]
 
+    [SerializeField]
+    private Transform _bodyReference;
+
     [Min(1.0f)]
     [SerializeField]
     private float _rotationSpeed = 720.0f;
@@ -83,7 +86,7 @@ public class CATCharacterMovementController : MonoBehaviour
 
     [Min(0.1f)]
     [SerializeField]
-    private float _characterMass = 70.0f;
+    private float _characterMass = 50.0f;
 
     [Min(0.01f)]
     [SerializeField]
@@ -113,16 +116,16 @@ public class CATCharacterMovementController : MonoBehaviour
 
     [SerializeField]
     private bool _enableGravity = true;
-    [Min(0.1f)]
 
+    [Min(0.1f)]
     [SerializeField]
     private float _gravityAcceleration = 9.81f;
-    [Min(0.1f)]
 
+    [Min(0.1f)]
     [SerializeField]
     private float _gravityRiseMultiplier = 0.75f;
-    [Min(0.1f)]
 
+    [Min(0.1f)]
     [SerializeField]
     private float _gravityFallMultiplier = 1.00f;
 
@@ -130,8 +133,8 @@ public class CATCharacterMovementController : MonoBehaviour
 
     [SerializeField]
     private Vector3 _groundCheckOffset = Vector3.zero;
-    [Min(0.0f)]
 
+    [Min(0.0f)]
     [SerializeField]
     private float _groundCheckRadius = 0.25f;
 
@@ -141,7 +144,7 @@ public class CATCharacterMovementController : MonoBehaviour
     // ============================================================================================
     //  PRIVATE MEMBERS
     // ============================================================================================
-    
+
     private Rigidbody _rigidbodyComponent;
 
     private ICATCharacterInputController _inputControllerComponent;
@@ -180,23 +183,25 @@ public class CATCharacterMovementController : MonoBehaviour
 
     public ECATCharacterMovementState MovementState => _movementState;
 
+    public Vector3 CurrentVelocity => _rigidbodyComponent.velocity;
+
     public bool IsGrounded => _isGrounded;
 
     public bool IsSprinting => _isSprinting;
 
     public bool IsJumping => _isJumping;
 
+    public Action OnJump;
+
+    public Action OnDoubleJump;
+    
+    public Action OnLand;
+    
+    public Action OnFall;
+
     // ============================================================================================
     //  PRIVATE METHODS
     // ============================================================================================
-
-     private void OnSprintPressed()
-    {
-        if (_enableSprint == true && _isGrounded == true && _isJumping == false)
-        {
-            _isSprinting = !_isSprinting;
-        }
-    }
 
     private void OnJumpPressed()
     {
@@ -215,7 +220,7 @@ public class CATCharacterMovementController : MonoBehaviour
         _rigidbodyComponent.constraints = RigidbodyConstraints.FreezeRotation;
     }
 
-     private void CheckGround()
+    private void CheckGround()
     {
         bool wasGrounded = _isGrounded;
 
@@ -234,11 +239,15 @@ public class CATCharacterMovementController : MonoBehaviour
             _jumpHoldTimer = 0.0f;
 
             _jumpMinVelocityApplied = false;
+
+            OnLand?.Invoke();
         }
 
         if (wasGrounded == true && _isGrounded == false && _isJumping == false)
         {
             _coyoteTimer = _jumpCoyoteTime;
+
+            OnFall?.Invoke();
         }
     }
 
@@ -261,11 +270,15 @@ public class CATCharacterMovementController : MonoBehaviour
                     if (canJumpFromGround == false)
                     {
                         _remainingJumpCount--;
+
+                        OnDoubleJump?.Invoke();
+                    }
+                    else
+                    {
+                        OnJump?.Invoke();
                     }
 
                     _isJumping = true;
-
-                    _isSprinting = false;
 
                     _jumpMinVelocityApplied = false;
 
@@ -331,11 +344,13 @@ public class CATCharacterMovementController : MonoBehaviour
     private void ApplyTranslationMovement()
     {
         Vector2 moveVector = _inputControllerComponent.MoveVector;
-
+        
         bool wantsToMove = moveVector.sqrMagnitude > 0.001f;
 
         float targetSpeed = 0.0f;
 
+        _isSprinting = (_isGrounded == true && _inputControllerComponent.SprintHeld == true);
+        
         if (wantsToMove == true)
         {
             if (_enableSprint == true && _isSprinting == true)
@@ -346,11 +361,6 @@ public class CATCharacterMovementController : MonoBehaviour
             {
                 targetSpeed = _walkNominalVelocity;
             }
-        }
-
-        if (_isGrounded == false)
-        {
-            targetSpeed *= _airControlabilityFactor;
         }
 
         Vector3 cameraForward = MovementOrientation * Vector3.forward;
@@ -392,46 +402,68 @@ public class CATCharacterMovementController : MonoBehaviour
             _speedBlend = _decelerationCurve.Evaluate(_speedBlendTime);
         }
 
-        Vector3 appliedVelocity = targetHorizontalVelocity * _speedBlend;
+        Vector3 currentHorizontal = new Vector3(_rigidbodyComponent.velocity.x, 0f, _rigidbodyComponent.velocity.z);
 
-        _rigidbodyComponent.velocity = new Vector3(appliedVelocity.x, _rigidbodyComponent.velocity.y, appliedVelocity.z);
-    }
-
-    private void ApplyRotationMovement()
-    {
-        Vector2 moveVector = _inputControllerComponent.MoveVector;
-
-        if (moveVector.sqrMagnitude < 0.001f)
+        if (_isGrounded == true)
         {
-            _rotationBlendTime = 0.0f;
+            Vector3 desiredHorizontal = targetHorizontalVelocity * _speedBlend;
+
+            Vector3 velocityDelta = desiredHorizontal - currentHorizontal;
+
+            _rigidbodyComponent.AddForce(velocityDelta, ForceMode.VelocityChange);
         }
         else
         {
-            Vector3 cameraForward = MovementOrientation * Vector3.forward;
+            Vector3 airTarget = targetHorizontalVelocity * _speedBlend;
+         
+            float lerpFactor = Mathf.Pow(_airControlabilityFactor, Time.fixedDeltaTime * 60f);
+            
+            Vector3 newHorizontal = Vector3.Lerp(currentHorizontal, airTarget, lerpFactor);
+            
+            Vector3 velocityDelta = newHorizontal - currentHorizontal;
+            
+            _rigidbodyComponent.AddForce(velocityDelta, ForceMode.VelocityChange);
+        }
+    }
 
-            cameraForward = new Vector3(cameraForward.x, 0.0f, cameraForward.z).normalized;
+    private void ApplyBodyRotationMovement()
+    {
+        if (_rigidbodyComponent != null)
+        {
+            Vector2 moveVector = _inputControllerComponent.MoveVector;
 
-            Vector3 cameraRight = MovementOrientation * Vector3.right;
+            if (moveVector.sqrMagnitude < 0.001f)
+            {
+                _rotationBlendTime = 0.0f;
+            }
+            else
+            {
+                Vector3 cameraForward = MovementOrientation * Vector3.forward;
 
-            cameraRight = new Vector3(cameraRight.x, 0.0f, cameraRight.z).normalized;
+                cameraForward = new Vector3(cameraForward.x, 0.0f, cameraForward.z).normalized;
 
-            Vector3 moveDirection = (cameraForward * moveVector.y + cameraRight * moveVector.x).normalized;
+                Vector3 cameraRight = MovementOrientation * Vector3.right;
 
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+                cameraRight = new Vector3(cameraRight.x, 0.0f, cameraRight.z).normalized;
 
-            _rotationBlendTime = Mathf.Clamp01(_rotationBlendTime + Time.fixedDeltaTime / Mathf.Max(0.001f, _rotationAccelerationTime));
+                Vector3 moveDirection = (cameraForward * moveVector.y + cameraRight * moveVector.x).normalized;
 
-            float rotationSpeedThisFrame = _rotationSpeed * _rotationCurve.Evaluate(_rotationBlendTime);
+                Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
 
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeedThisFrame * Time.fixedDeltaTime);
+                _rotationBlendTime = Mathf.Clamp01(_rotationBlendTime + Time.fixedDeltaTime / Mathf.Max(0.001f, _rotationAccelerationTime));
+
+                float rotationSpeedThisFrame = _rotationSpeed * _rotationCurve.Evaluate(_rotationBlendTime);
+
+                _bodyReference.rotation = Quaternion.RotateTowards(_bodyReference.rotation, targetRotation, rotationSpeedThisFrame * Time.fixedDeltaTime);
+            }
         }
     }
 
     private void ApplyGravity()
     {
-        if (_enableGravity == true && (_isJumping == false || _jumpHoldTimer >= _jumpFullHoldTime))
+        if (_enableGravity == true)
         {
-            float gravityMultiplier = (_rigidbodyComponent.velocity.y > 0.00f) ? _gravityRiseMultiplier : _gravityFallMultiplier;
+            float gravityMultiplier = (_rigidbodyComponent.velocity.y > 0.0f) ? _gravityRiseMultiplier : _gravityFallMultiplier;
 
             Vector3 gravityForce = _characterMass * _gravityAcceleration * gravityMultiplier * Vector3.down;
 
@@ -463,36 +495,32 @@ public class CATCharacterMovementController : MonoBehaviour
             }
         }
     }
-    
-    // ============================================================================================
-	//  UNITY EVENT FUNCTIONS
-	// ============================================================================================
 
-     private void Awake()
+    // ============================================================================================
+    //  UNITY EVENT FUNCTIONS
+    // ============================================================================================
+
+    private void Awake()
     {
         _rigidbodyComponent = GetComponent<Rigidbody>();
 
         _inputControllerComponent = GetComponent<ICATCharacterInputController>();
 
-        _inputControllerComponent.SprintPressed += OnSprintPressed;
-
         _inputControllerComponent.JumpPressed += OnJumpPressed;
-
-        MovementOrientation = transform.rotation;
 
         _remainingJumpCount = _maximumJumpCount + 1;
 
+        MovementOrientation = transform.rotation;
+
         SetupRigidbody();
     }
-    
+
     private void OnDestroy()
     {
-        _inputControllerComponent.SprintPressed -= OnSprintPressed;
-
         _inputControllerComponent.JumpPressed -= OnJumpPressed;
     }
 
-     private void FixedUpdate()
+    private void FixedUpdate()
     {
         CheckGround();
 
@@ -502,7 +530,7 @@ public class CATCharacterMovementController : MonoBehaviour
 
         ApplyTranslationMovement();
 
-        ApplyRotationMovement();
+        ApplyBodyRotationMovement();
 
         UpdateMovementState();
     }
