@@ -43,10 +43,12 @@ GameObject:
   - component: {fileID: 1633794994382411321}
   - component: {fileID: 1517211957839106396}
   - component: {fileID: 1343573717454970251}
+  - component: {fileID: 2645789149943304048}
   - component: {fileID: 8787128279659010098}
   - component: {fileID: 5666270519427056944}
   - component: {fileID: 6078140701585723510}
   - component: {fileID: 27539047168673267}
+  - component: {fileID: 2777797005007922535}
   m_Layer: 0
   m_Name: PRF_Player_Astronaut_Character
   m_TagString: Untagged
@@ -101,6 +103,26 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!95 &2645789149943304048
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288402682328412973}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 6cbec72160c0f2f4b99198aa49353aab, type: 3}
+  m_Controller: {fileID: 9100000, guid: b38e4abc28f33fa41bf4d11c10217fa1, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &8787128279659010098
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -424,6 +446,22 @@ MonoBehaviour:
   _groundLayers:
     serializedVersion: 2
     m_Bits: 64
+--- !u!114 &2777797005007922535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288402682328412973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 879a8c0521cb67b449ef0b3b16c79432, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _idleSpeedThreshold: 0.05
+  _walkAnimationSpeed: 0.5
+  _sprintAnimationSpeed: 1
+  _speedBlendRate: 10
 --- !u!1 &8508516286771850620
 GameObject:
   m_ObjectHideFlags: 0
